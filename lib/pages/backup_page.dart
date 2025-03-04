@@ -34,9 +34,29 @@ class BackupPageState extends State<BackupPage> {
       final contents = await file.readAsString();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('복원이 완료되었습니다: $contents')),
-        );
+        // 파일 내용을 파싱하고 데이터베이스에 삽입
+        final lines = contents.split('\n');
+        for (final line in lines) {
+          if (line.isNotEmpty) {
+            final parts = line.split(', ');
+            if (parts.length == 2) {
+              final namePart = parts[0].split(': ');
+              final numberPart = parts[1].split(': ');
+              if (namePart.length == 2 && numberPart.length == 2) {
+                final name = namePart[1];
+                final number = numberPart[1];
+                await DatabaseHelper.instance
+                    .insertContact({'name': name, 'number': number});
+              }
+            }
+          }
+        }
+        if (mounted) {
+          // mounted 체크 추가
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('복원이 완료되었습니다.')),
+          );
+        }
       }
     }
   }
@@ -46,7 +66,7 @@ class BackupPageState extends State<BackupPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('백업 및 복원'),
-        backgroundColor: Colors.purple[100], // 연한 보라색 적용
+        backgroundColor: Colors.purple[100],
       ),
       body: Center(
         child: Column(
