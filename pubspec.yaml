@@ -21,6 +21,8 @@ dependencies:
     sdk: flutter
   share_plus: ^10.1.4
   flutter_file_dialog: ^3.0.2 #flutter_file_dialog 추가
+  encrypt: ^5.0.1
+  path_provider_android: ^2.0.0
 
 dev_dependencies:
   flutter_test:

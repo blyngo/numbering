@@ -1,9 +1,11 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:logger/logger.dart'; // logger 패키지 import
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
+  final logger = Logger(); // logger 인스턴스 생성
 
   DatabaseHelper._init();
 
@@ -22,19 +24,24 @@ class DatabaseHelper {
       version: 1,
       onCreate: (db, version) async {
         await db.execute('''
-        CREATE TABLE contacts (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL,
-          number TEXT NOT NULL
-        )
-        ''');
+          CREATE TABLE contacts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            number TEXT NOT NULL UNIQUE
+          )
+          ''');
       },
     );
   }
 
   Future<void> insertContact(Map<String, dynamic> contact) async {
     final db = await instance.database;
-    await db.insert('contacts', contact);
+    try {
+      await db.insert('contacts', contact);
+    } catch (e) {
+      logger.e('데이터 삽입 오류: $e'); // logger 사용
+      throw Exception('데이터 삽입 실패');
+    }
   }
 
   Future<List<Map<String, dynamic>>> getContacts() async {
