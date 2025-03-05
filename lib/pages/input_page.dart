@@ -29,8 +29,14 @@ class InputPageState extends State<InputPage> {
         'number': number,
       });
       widget.onItemAdded();
+      // 입력 필드 초기화
+      nameController.clear();
+      numberController.clear();
+      isCard = false;
+      setState(() {}); // 상태 업데이트
       if (mounted) {
-        Navigator.pop(context);
+        // mounted 체크 추가
+        FocusScope.of(context).unfocus();
       }
     }
   }
